@@ -33,6 +33,12 @@ class userController
             case 'POST':
                 $response = $this->createNewUser();
                 break;
+            case 'DELETE':
+                $response = $this->deleteUser();
+                break;
+            case 'PUT';
+                $response = $this->updateUser();
+                break;
             default:
                 $response = $this->notFoundResponse();
                 break;
@@ -90,54 +96,55 @@ class userController
         $response['body'] = null;
         return $response;
     }
+    private function deleteUser()
+    {
+        $response = null;
+        $userToDelete = new User($this->database);
+        $data = $data = json_decode(file_get_contents("php://input"));
+        $userToDelete->ID = $data->id;
+        if ($userToDelete->delete()) {
+            $response['status_code_header'] = 'HTTP/1.1 200 OK';
+            $response['body'] = json_encode("User deleted");
 
-    private function createNewUser()
+        } else {
+            $response['status_code_header'] = 'HTTP/1.1 404 Not Found';
+            $response['body'] = json_encode("Failed to delete the user");
+        }
+        return $response;
+    }
+    private function updateUser()
     {
         $data = json_decode(file_get_contents("php://input"));
-        
-        if (isset($data)) {
-            if ($this->user->createUser($data->email, $data->user, $data->pass)) {
-                $response['status_code_header'] = 'HTTP/1.1 200 OK';
-                $response['body'] = json_encode("User Added!");
 
+        if (isset($data)) {
+            if ($this->user->update($data->id, $data->email, $data->user, $data->pass)) {
+                $response['status_code_header'] = 'HTTP/1.1 200 OK';
+                $response['body'] = json_encode("User Modified!");
             } else {
                 $response['status_code_header'] = 'HTTP/1.1 404 Not Found';
                 $response['body'] = null;
             }
-
         } else {
             $response['status_code_header'] = 'HTTP/1.1 404 Not Found';
             $response['body'] = null;
         }
         return $response;
     }
+    private function createNewUser()
+    {
+        if ($this->user->insertUser($_POST["email"], $_POST["user"], $_POST["pass"], )) {
+            $response['status_code_header'] = 'HTTP/1.1 200 OK';
+            $response['body'] = json_encode("User Added!");
+
+        } else {
+            $response['status_code_header'] = 'HTTP/1.1 404 Not Found';
+            $response['body'] = null;
+        }
+        return $response;
+
+    }
 
 }
-
-/*$items = new User($db);
-$stmt = $items->getUsers();
-$count = $stmt->rowCount();
-echo json_encode($count);
-if ($count > 0) {
-$userArr = array();
-$userArr["body"] = array();
-$userArr["itemCount"] = $count;
-while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-extract($row);
-$u = array(
-"ID" => $ID,
-"EMAIL" => $EMAIL,
-"UserName" => $UserName
-);
-array_push($userArr["body"], $u);
-}
-echo json_encode($userArr);
-} else {
-http_response_code(404);
-echo json_encode(
-array("message" => "No record found.")
-);
-}*/
 
 
 
