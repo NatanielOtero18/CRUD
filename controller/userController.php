@@ -99,9 +99,8 @@ class userController
     private function deleteUser()
     {
         $response = null;
-        $userToDelete = new User($this->database);
-        $data = $data = json_decode(file_get_contents("php://input"));
-        $userToDelete->ID = $data->id;
+        $userToDelete = new User($this->database);       
+        $userToDelete->ID = $this->user_Id;
         if ($userToDelete->delete()) {
             $response['status_code_header'] = 'HTTP/1.1 200 OK';
             $response['body'] = json_encode("User deleted");
@@ -115,9 +114,10 @@ class userController
     private function updateUser()
     {
         $data = json_decode(file_get_contents("php://input"));
+        
 
         if (isset($data)) {
-            if ($this->user->update($data->id, $data->email, $data->user, $data->pass)) {
+            if ($this->user->update($this->user_Id, $data->email, $data->user, $data->pass)) {
                 $response['status_code_header'] = 'HTTP/1.1 200 OK';
                 $response['body'] = json_encode("User Modified!");
             } else {

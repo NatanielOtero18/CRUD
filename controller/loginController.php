@@ -18,10 +18,11 @@ class loginController
     }
     private function sanitizeData()
     {
-        $data = json_decode(file_get_contents("php://input"));
+        $email = $_POST["email"];
+        $pass = $_POST["pass"];
 
-        $this->email = htmlspecialchars(strip_tags($data->email));
-        $this->pwd = htmlspecialchars(strip_tags($data->pass));
+        $this->email = htmlspecialchars(strip_tags($email));
+        $this->pwd = htmlspecialchars(strip_tags($pass));
     }
     private function getCredentials()
     {
